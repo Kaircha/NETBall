@@ -16,15 +16,22 @@ builder.Services.AddScoped<TrainerService>();
 builder.Services.AddScoped<PokemonService>();
 builder.Services.AddScoped<BoxService>();
 
+builder.Services.AddCors();
+builder.Services.AddMvc();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
   app.UseSwagger();
   app.UseSwaggerUI();
+  app.UseCors(builder => builder.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
 }
 
 app.MapControllers();
 app.CreateDatabase();
+
 
 app.Run();

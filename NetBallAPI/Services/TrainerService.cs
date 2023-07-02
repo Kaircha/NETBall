@@ -12,9 +12,25 @@ public class TrainerService {
     Context = context;
   }
 
-  public IEnumerable<Trainer> GetAll() => Context.Trainers.AsNoTracking().ToList();
+  public IEnumerable<Trainer> GetAll() {
+    List<Trainer> trainers = Context.Trainers.ToList();
 
-  public async Task<Trainer?> GetById(int id) => await Context.Trainers.FindAsync(id) ?? throw new DataNotFoundException(nameof(Trainer), id);
+    foreach (Trainer trainer in trainers) {
+      trainer.CaughtPokemon = Context.Pokemons.Where(p => p.CatcherId == trainer.Id).ToList();
+      trainer.OwnedPokemon = Context.Pokemons.Where(p => p.OwnerId == trainer.Id).ToList();
+    }
+
+    return trainers;
+  }
+
+  public async Task<Trainer?> GetById(int id) {
+    Trainer? trainer = await Context.Trainers.FindAsync(id) ?? throw new DataNotFoundException(nameof(Trainer), id);
+
+    trainer.CaughtPokemon = Context.Pokemons.Where(p => p.CatcherId == trainer.Id).ToList();
+    trainer.OwnedPokemon = Context.Pokemons.Where(p => p.OwnerId == trainer.Id).ToList();
+
+    return trainer;
+  }
 
   public async Task<Trainer> Create(Trainer newTrainer) {
     Context.Trainers.Add(newTrainer);
