@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using NetBallAPI.Data;
 using NetBallAPI.Services;
+using Microsoft.AspNetCore.SpaServices.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,11 @@ builder.Services.AddScoped<BoxService>();
 builder.Services.AddCors();
 builder.Services.AddMvc();
 
+builder.Services.AddSpaStaticFiles(configuration => configuration.RootPath = "frontend/dist");
+
+
 var app = builder.Build();
+app.UsePathBase(new PathString("/api"));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
@@ -28,10 +33,14 @@ if (app.Environment.IsDevelopment()) {
   app.UseCors(builder => builder.AllowAnyOrigin()
                                 .AllowAnyMethod()
                                 .AllowAnyHeader());
+
+  //app.UseSpa(spa => {
+  //  spa.UseProxyToSpaDevelopmentServer("http://localhost:8085");
+  //});
 }
 
-app.MapControllers();
 app.CreateDatabase();
-
+app.UseRouting();
+app.MapControllers();
 
 app.Run();
