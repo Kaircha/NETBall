@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Trainer, renderTrainer } from './Trainer' 
+import { Trainer, TrainerCard } from './Trainer' 
 
 function App() {
   const [trainers, setTrainers] = useState<Trainer[]>([]);
@@ -16,8 +16,11 @@ function App() {
   return (
     <>
       <div className="flex flex-col">
-        {renderTrainer(trainers[0])}
-        {/*trainers.map(trainer => renderTrainer(trainer))*/}
+        {trainers.map(trainer => 
+          <TrainerCard
+          key={trainer.id}
+          trainer={trainer}
+          />)}
       </div>
     </>
   );
