@@ -15,12 +15,13 @@ function App() {
   
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col divide-gray-300">
         {trainers.map(trainer => 
           <TrainerCard
-          key={trainer.id}
-          trainer={trainer}
-          />)}
+            key={trainer.id}
+            trainer={trainer}
+          />
+        )}
       </div>
     </>
   );

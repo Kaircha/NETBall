@@ -30,6 +30,7 @@ public class PokemonController : ControllerBase {
 
   [HttpPost]
   public async Task<IActionResult> Create(Pokemon newPokemon) {
+    if (newPokemon.Dex == 855) return StatusCode(418); // Actually the wrong use of this
     var pokemon = await PokemonService.Create(newPokemon);
     return CreatedAtAction(nameof(PokemonService.Create), new { id = pokemon.Id }, pokemon);
   }
