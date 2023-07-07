@@ -14,15 +14,23 @@ export interface PokemonProps {
   handleRelease: () => void;
 }
 
+export function pokemonFullName(name: string) {
+  return name[0].toUpperCase() + name.slice(1).toLowerCase();
+}
+
+export function pokemonDisplayName(name: string) {
+  return (name[0].toUpperCase() + name.slice(1).toLowerCase()).split('-')[0];
+}
+
 export function PokemonCard({ apiPokemon, dbPokemon, handleRelease }: PokemonProps) {
-  const fullName: string = apiPokemon.name[0].toUpperCase() + apiPokemon.name.slice(1).toLowerCase();
-  const displayName: string = fullName.split('-')[0];
+  const fullName: string = pokemonFullName(apiPokemon.name);
+  const displayName: string = pokemonDisplayName(apiPokemon.name);
 
   return (
     <div 
       id={dbPokemon.id.toString()}
       className="w-24 h-40 m-1 bg-white bg-repeat bg-[length:40px] rounded-lg transition ease-in-out hover:scale-110" 
-      style={{backgroundImage: `url(./bgtest.png)`}}
+      style={{backgroundImage: `url(./pokecard-bg.png)`}}
     >
       <div className="absolute w-24 flex">
         {apiPokemon.types.map((type) => 

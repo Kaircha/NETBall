@@ -67,9 +67,9 @@ export function TrainerCard({ trainer }: TrainerProps) {
             handleRelease={() => handleReleasePokemon(ownedDbPokemon[i].id)}
           />
         )}
-        <div className="w-24 h-36">
+        <div className="w-24 h-36 transition ease-in-out hover:scale-110">
           <button 
-            className="w-20 h-32 border m-2 text-2xl text-gray-400"
+            className="w-[5.5rem] h-36 border border-gray-300 rounded m-2 text-2xl text-gray-400"
             onClick={handleCatchPokemon}
           >
           +
