@@ -1,4 +1,5 @@
 import { Pokemon as ApiPokemon } from "pokenode-ts";
+import PokemonUtils from "../utils/pokemon";
 
 export type DbPokemon = {
   id: number;
@@ -6,34 +7,28 @@ export type DbPokemon = {
   name: string;
   catcherId: number;
   ownerId: number;
+  api?: ApiPokemon
 }
 
 export interface PokemonProps {
-  apiPokemon: ApiPokemon;
-  dbPokemon: DbPokemon;
+  pokemon: DbPokemon;
   handleRelease: () => void;
 }
 
-export function pokemonFullName(name: string) {
-  return name[0].toUpperCase() + name.slice(1).toLowerCase();
-}
 
-export function pokemonDisplayName(name: string) {
-  return (name[0].toUpperCase() + name.slice(1).toLowerCase()).split('-')[0];
-}
 
-export function PokemonCard({ apiPokemon, dbPokemon, handleRelease }: PokemonProps) {
-  const fullName: string = pokemonFullName(apiPokemon.name);
-  const displayName: string = pokemonDisplayName(apiPokemon.name);
+export function PokemonCard({ pokemon, handleRelease }: PokemonProps) {
+  const fullName: string = PokemonUtils.fullName(pokemon.api?.name ?? "");
+  const displayName: string = PokemonUtils.displayName(pokemon.api?.name ?? "");
 
   return (
     <div 
-      id={dbPokemon.id.toString()}
+      id={pokemon.id.toString()}
       className="w-24 h-40 m-1 bg-white bg-repeat bg-[length:40px] rounded-lg transition ease-in-out hover:scale-110" 
       style={{backgroundImage: `url(./pokecard-bg.png)`}}
     >
       <div className="absolute w-24 flex">
-        {apiPokemon.types.map((type) => 
+        {pokemon.api?.types.map((type) => 
           <img
             key={type.slot}
             className="w-8 h-8 p-0.5"
@@ -45,12 +40,12 @@ export function PokemonCard({ apiPokemon, dbPokemon, handleRelease }: PokemonPro
       <div>
         <img
           className="h-24 object-none object-cover object-bottom"
-          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${apiPokemon.id}.gif`}
+          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${pokemon.api?.id}.gif`}
           alt={displayName}
         />
       </div>
         <div className="w-24 h-5 text-center font-medium bg-white border-t">
-          {dbPokemon.name ? dbPokemon.name : displayName}
+          {pokemon.name ?? displayName}
         </div>
         <div className="w-24 h-6 text-center font-light bg-white">
           {displayName}

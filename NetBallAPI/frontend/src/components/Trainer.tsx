@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { MainClient, Pokemon as ApiPokemon } from "pokenode-ts";
 import { PokemonCard, DbPokemon } from "./Pokemon";
 import axios from "axios";
+import { useFoo } from "../hooks/foo";
 
 export interface Trainer {
   id: number;
@@ -16,41 +17,28 @@ export interface TrainerProps {
 }
 
 export function TrainerCard({ trainer }: TrainerProps) {
-  const [ownedApiPokemon, setOwnedApiPokemon] = useState<ApiPokemon[]>();
-  const [ownedDbPokemon, setOwnedDbPokemon] = useState<DbPokemon[]>(trainer.ownedPokemon);
-  const api = new MainClient();
 
-  useEffect(() => {
-    (async () => {
-      const data = await Promise.all(
-        ownedDbPokemon.map((pokemon) =>
-          api.pokemon.getPokemonById(pokemon.dex)
-        )
-      );
-      setOwnedApiPokemon(data);
-    })();
-  }, [trainer, trainer.ownedPokemon, ownedDbPokemon]);
+  const [pokemon, addPokemon, removePokemon] = useFoo(trainer.ownedPokemon);   
 
   function handleCatchPokemon() {
+    
     axios.post("https://localhost:7125/pokemon", {
       id: 0,
       dex: Math.floor(Math.random() * 649) + 1,
       catcherId: trainer.id,
       ownerId: trainer.id,
     })
-    .then((response) => setOwnedDbPokemon([...ownedDbPokemon, response.data]))
+    .then((response) => addPokemon(response.data))
     .catch((error) => console.log(error));
   }
 
   function handleReleasePokemon(id: number) {
     axios.delete(`https://localhost:7125/pokemon/${id}`)
-    .then(() => {
-      setOwnedDbPokemon(ownedDbPokemon.filter(x => x.id != id))
-    })
+    .then(() => removePokemon(id))
     .catch((error) => console.log(error));
   }
 
-  if (ownedApiPokemon === undefined) return <>Loading...</>;
+  if (pokemon === undefined) return <>Loading...</>;
 
   return (
     <div className="p-4 my-2 mx-auto bg-gray-100 rounded-lg">
@@ -58,12 +46,11 @@ export function TrainerCard({ trainer }: TrainerProps) {
         {trainer.name}'{!trainer.name.endsWith('s') && "s"} Pokémon
       </div>
       <div className="grid grid-cols-6 gap-1">
-        {ownedApiPokemon.map((apiPokemon, i) =>
+        {pokemon.map((apiPokemon, i) =>
           ownedDbPokemon[i] !== undefined &&
           <PokemonCard 
             key={ownedDbPokemon[i].id} 
-            apiPokemon={apiPokemon} 
-            dbPokemon={ownedDbPokemon[i]} 
+            pokemon={ownedDbPokemon[i]} 
             handleRelease={() => handleReleasePokemon(ownedDbPokemon[i].id)}
           />
         )}

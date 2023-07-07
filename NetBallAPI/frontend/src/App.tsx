@@ -1,14 +1,10 @@
-import { useEffect, useState, createContext } from 'react'
+import { useEffect, useState } from 'react'
 import { Trainer, TrainerCard } from './components/Trainer' 
 import Catching from "./components/Catching";
+import { USER_ID } from './utils/constants';
+import { TrainerContextProps, TrainersContext } from './utils/context';
 
-export interface TrainerContextProps {
-  trainers: Trainer[];
-  setTrainers: React.Dispatch<React.SetStateAction<Trainer[]>>;
-}
 
-export const USER_ID: number = 1;
-export const TrainersContext = createContext<TrainerContextProps|undefined>(undefined);
 
 function App() {
   const [trainers, setTrainers] = useState<Trainer[]>([]);
