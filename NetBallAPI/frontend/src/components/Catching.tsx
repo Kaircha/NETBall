@@ -12,11 +12,27 @@ export enum CatchState {
   PokemonForm,
 }
 
+// const CatchStateThing = {
+//   Begin: 0,
+//   WildPokemon: 1,
+//   BallThrown: 2,
+//   PokemonCaught: 3,
+//   PokemonForm: 4,
+//   0: "Begin",
+//   1: "WildPokemon",
+//   2: "BallThrown",
+//   3: "PokemonCaught",
+//   4: "PokemonForm"
+// }
+// export type CatchState2 = "begin" | "wildpokemon" | "ballthrown" | "pokemoncaught" | "pokemonform"
+
+
+
 export default function Catching() {
   const [wildPokemon, setWildPokemon] = useState<ApiPokemon>()
-  const [catchState, setCatchState] = useState<CatchState>(CatchState.Begin)
+  const [catchState, setCatchState] = useState(CatchState.Begin)
   const [pokemonName, setPokemonName] = useState<string>();
-  const [isPosted, setIsPosted] = useState<boolean>(false);
+  const [isPosted, setIsPosted] = useState(false);
   const api = new MainClient();
 
   async function handleEncounterPokemon() {
@@ -27,14 +43,14 @@ export default function Catching() {
   }
 
   async function handleCatchPokemon() {
-    if (catchState !== CatchState.WildPokemon || wildPokemon === undefined) return;
+    if (catchState !== CatchState.WildPokemon || wildPokemon === undefined) throw new Error("impossible state arose");
     setCatchState(CatchState.BallThrown);
 
     const catchRate = 0.9; // 65.61% chance to catch
     const fleeRate = 0.4; // 40% chance to flee after a failed catch
 
     for (let i = 0; i < 4; i++) {
-      await new Promise(wait => setTimeout(wait, 1000))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       if (Math.random() > catchRate) {
         setCatchState(Math.random() > fleeRate ? CatchState.WildPokemon : CatchState.Begin);
         return;
@@ -42,7 +58,7 @@ export default function Catching() {
     }
 
     setCatchState(CatchState.PokemonCaught);
-    await new Promise(wait => setTimeout(wait, 2000))
+    await new Promise(resolve => setTimeout(resolve, 2000))
     // Could do a form here to name the pokemon etc. before continuing
     setCatchState(CatchState.PokemonForm);
     setIsPosted(false);
@@ -65,11 +81,11 @@ export default function Catching() {
 
   // Returns the Component correlating to each state
   switch (catchState) {
-    case CatchState.Begin: return Begin();
-    case CatchState.WildPokemon: return WildPokemon();
-    case CatchState.BallThrown: return BallThrown();
-    case CatchState.PokemonCaught: return PokemonCaught();
-    case CatchState.PokemonForm: return PokemonForm();
+    case CatchState.Begin: return <Begin/>;
+    case CatchState.WildPokemon: return <WildPokemon/>;
+    case CatchState.BallThrown: return <BallThrown/>;
+    case CatchState.PokemonCaught: return <PokemonCaught/>;
+    case CatchState.PokemonForm: return <PokemonForm/>;
   }
 
   function Begin() {

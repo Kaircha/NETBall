@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DbPokemon } from "../components/Pokemon";
 import { MainClient } from "pokenode-ts";
 import { usePreviousValue } from "./previousValue";
+import { produce } from 'immer';
 
 const api = new MainClient();
 async function fetchPokemon(pokemon: DbPokemon[]) {
@@ -44,6 +45,9 @@ export function usePokemon(initialPokemon: DbPokemon[]) {
 
     function addPokemon(newPokemon: DbPokemon) {
       setPokemon([...pokemon, newPokemon])
+      // setPokemon(produce(pokemon, draft => {
+      //   draft.push(newPokemon)
+      // }))
     }
 
     // Why is JS so garbage? No Remove method that returns the removed element
@@ -54,9 +58,19 @@ export function usePokemon(initialPokemon: DbPokemon[]) {
     }
 
     function replacePokemon(id: number, newPokemon: DbPokemon) {
-      const index = pokemon.findIndex(p => p.id === id);
-      pokemon.splice(index, 1, newPokemon); // returns the removed values
-      setPokemon(pokemon);
+      // const index = pokemon.findIndex(p => p.id === id);
+      // const beforeFound = pokemon.slice(0, index - 1);
+      // const afterFound = pokemon.slice(index + 1);
+      // setPokemon([...beforeFound, newPokemon, ...afterFound]);
+      // produce takes:
+      //   the object you wanna mutate
+      //   a function, from a _draft_ of the object (it looks like the object and quacks like the object)
+      //      returns either: a modified object, or void
+      const producedPokemon = produce(pokemon, draftPokemon => {
+        const index = draftPokemon.findIndex(p => p.id === id);
+        draftPokemon.splice(index, 1, newPokemon); // returns the removed values  
+      })
+      setPokemon(producedPokemon);
     }
 
     return [pokemon, addPokemon, removePokemon, replacePokemon] as const;

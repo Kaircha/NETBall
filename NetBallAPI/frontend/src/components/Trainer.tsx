@@ -1,6 +1,8 @@
 import { PokemonCard, DbPokemon } from "./Pokemon";
 import axios from "axios";
 import { usePokemon } from "../hooks/pokemon";
+import { useEffect, useMemo, useState } from "react";
+import { filterNulls } from "../utils/functions";
 
 export interface Trainer {
   id: number;
@@ -16,7 +18,16 @@ export interface TrainerProps {
 
 export function TrainerCard({ trainer }: TrainerProps) {
 
-  const [pokemon, addPokemon, removePokemon, replacePokemon] = usePokemon(trainer.ownedPokemon);   
+  const [pokemon, addPokemon, removePokemon] = usePokemon(trainer.ownedPokemon);   
+
+  const [pendingPokemon, setPendingPokemon] = useState<DbPokemon>();
+
+  const showablePokemon = useMemo(() => filterNulls([...pokemon, pendingPokemon]), [pokemon, pendingPokemon])
+
+  // const [showablePokemon2, setShowablePokemon2] = useState(filterNulls([...pokemon, pendingPokemon]));
+  // useEffect(() => {
+  //   setShowablePokemon2(filterNulls([...pokemon, pendingPokemon]))
+  // }, [pokemon, pendingPokemon])
 
   function handleCatchPokemon() {
     const newPokemon: DbPokemon = {
@@ -29,18 +40,21 @@ export function TrainerCard({ trainer }: TrainerProps) {
 
     console.log(pokemon);
 
-    addPokemon(newPokemon);
-    axios.post("https://localhost:7125/pokemon", newPokemon)
+    setPendingPokemon(newPokemon)
+  }
+
+  useEffect(() => {
+    axios.post("https://localhost:7125/pokemon", pendingPokemon)
     .then((response) => {
       console.log(response.data);
-      replacePokemon(0, response.data)
-      console.log(pokemon);
+      addPokemon(response.data); // pokemon#setState --> queues the action, to play on next render
     })
     .catch((error) => {
-      removePokemon(0);
       console.log(error)
-    });
-  }
+    }).finally(() => {
+      setPendingPokemon(undefined);
+    })
+  }, [pendingPokemon])
 
   function handleReleasePokemon(id: number) {
     const removedPokemon = removePokemon(id);
@@ -61,7 +75,7 @@ export function TrainerCard({ trainer }: TrainerProps) {
         {trainer.name}'{!trainer.name.endsWith('s') && "s"} Pokémon
       </div>
       <div className="grid grid-cols-6 gap-1">
-        {pokemon.map((pokemon) =>
+        {showablePokemon.map((pokemon) =>
           pokemon !== undefined &&
           <PokemonCard 
             key={pokemon.id} 
