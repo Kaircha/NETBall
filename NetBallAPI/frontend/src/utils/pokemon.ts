@@ -1,9 +1,11 @@
 const PokemonUtils = {
     fullName(name: string) {
-        return name[0].toUpperCase() + name.slice(1).toLowerCase();
+      if (name === undefined || name.length === 0) return ""; 
+      return name[0].toUpperCase() + name.slice(1).toLowerCase();
     },
     displayName(name: string) {
-        return (name[0].toUpperCase() + name.slice(1).toLowerCase()).split('-')[0];
+      if (name === undefined || name.length === 0) return ""; 
+      return (name[0].toUpperCase() + name.slice(1).toLowerCase()).split('-')[0];
     }
 }
 

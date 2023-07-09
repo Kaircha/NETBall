@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 import { Trainer, TrainerCard } from './components/Trainer' 
 import Catching from "./components/Catching";
 import { USER_ID } from './utils/constants';
-import { TrainerContextProps, TrainersContext } from './utils/context';
 
 
 
 function App() {
   const [trainers, setTrainers] = useState<Trainer[]>([]);
-  const trainerContext: TrainerContextProps = {trainers, setTrainers}
 
   useEffect(() => {
     (async () => {
@@ -36,12 +34,12 @@ function App() {
   const trainer: Trainer = trainers[Math.max(USER_ID-1, 0)];
 
   if (trainer !== undefined) return (
-    <TrainersContext.Provider value={trainerContext}>
+    <>
       <div className="flex flex-col">
         <TrainerCard trainer={trainer} />
       </div>
       <Catching />
-    </TrainersContext.Provider>
+    </>
   );
 }
 

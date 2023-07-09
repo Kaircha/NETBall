@@ -21,7 +21,7 @@ async function fetchPokemon(pokemon: DbPokemon[]) {
     
 }
 
-export function useFoo(initialPokemon: DbPokemon[]) {
+export function usePokemon(initialPokemon: DbPokemon[]) {
 
     const [pokemon, setPokemon] = useState(initialPokemon)
     const oldPokemon = usePreviousValue(pokemon)
@@ -43,13 +43,23 @@ export function useFoo(initialPokemon: DbPokemon[]) {
     }, [pokemon])
 
     function addPokemon(newPokemon: DbPokemon) {
-        setPokemon([...pokemon, newPokemon])
-    }
-    function removePokemon(id: number) {
-        setPokemon(pokemon.filter(p => p.id !== id))
+      setPokemon([...pokemon, newPokemon])
     }
 
-    return [pokemon, addPokemon, removePokemon] as const;
+    // Why is JS so garbage? No Remove method that returns the removed element
+    function removePokemon(id: number) {
+      const removedPokemon = pokemon.find(p => p.id === id);
+      setPokemon(pokemon.filter(p => p.id !== id))
+      return removedPokemon;
+    }
+
+    function replacePokemon(id: number, newPokemon: DbPokemon) {
+      const index = pokemon.findIndex(p => p.id === id);
+      pokemon.splice(index, 1, newPokemon); // returns the removed values
+      setPokemon(pokemon);
+    }
+
+    return [pokemon, addPokemon, removePokemon, replacePokemon] as const;
 
     // whenever that list changes, refresh api
 }

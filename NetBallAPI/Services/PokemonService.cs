@@ -19,6 +19,7 @@ public class PokemonService {
   public async Task<Pokemon?> GetByCatcherId(int catcherId) => await Context.Pokemons.AsNoTracking().SingleOrDefaultAsync(p => p.CatcherId == catcherId) ?? throw new DataNotFoundException(nameof(Pokemon), catcherId);
 
   public async Task<Pokemon> Create(Pokemon newPokemon) {
+    if (string.IsNullOrEmpty(newPokemon.Name)) newPokemon.Name = null;
     Context.Pokemons.Add(newPokemon);
     await Context.SaveChangesAsync();
 

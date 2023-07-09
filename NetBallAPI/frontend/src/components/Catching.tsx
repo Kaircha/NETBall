@@ -1,8 +1,8 @@
-import { TrainersContext, USER_ID } from "../App";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { MainClient, Pokemon as ApiPokemon } from "pokenode-ts";
-import { pokemonDisplayName } from "./Pokemon";
 import axios from "axios";
+import { USER_ID } from '../utils/constants';
+import PokemonUtils from "../utils/pokemon";
 
 export enum CatchState {
   Begin,
@@ -12,17 +12,12 @@ export enum CatchState {
   PokemonForm,
 }
 
-export interface CatchingProps {
-
-}
-
 export default function Catching() {
   const [wildPokemon, setWildPokemon] = useState<ApiPokemon>()
   const [catchState, setCatchState] = useState<CatchState>(CatchState.Begin)
   const [pokemonName, setPokemonName] = useState<string>();
   const [isPosted, setIsPosted] = useState<boolean>(false);
   const api = new MainClient();
-  const trainerContext = useContext(TrainersContext);
 
   async function handleEncounterPokemon() {
     const dex: number = Math.floor(Math.random() * 649) + 1;
@@ -64,13 +59,7 @@ export default function Catching() {
       catcherId: USER_ID,
       ownerId: USER_ID,
     })
-    .then((response) => {
-      setCatchState(CatchState.Begin)
-      if (trainerContext === undefined) return;
-      const trainers = trainerContext.trainers;
-      trainers[USER_ID].ownedPokemon = [...trainers[USER_ID].ownedPokemon, response.data]
-      trainerContext.setTrainers(trainers);
-    })
+    .then(() => setCatchState(CatchState.Begin))
     .catch((error) => console.log(error));
   }
 
@@ -160,7 +149,7 @@ export default function Catching() {
           {(wildPokemon !== undefined) && (
             <div className="w-80 h-64 m-auto">
               <div className="text-lg text-center font-medium">
-                You caught a {pokemonDisplayName(wildPokemon.name)}!
+                You caught a {PokemonUtils.displayName(wildPokemon.name)}!
               </div>
               <div className="w-80 h-40">
                 <img 

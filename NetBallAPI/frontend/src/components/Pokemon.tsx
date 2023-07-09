@@ -15,10 +15,7 @@ export interface PokemonProps {
   handleRelease: () => void;
 }
 
-
-
 export function PokemonCard({ pokemon, handleRelease }: PokemonProps) {
-  const fullName: string = PokemonUtils.fullName(pokemon.api?.name ?? "");
   const displayName: string = PokemonUtils.displayName(pokemon.api?.name ?? "");
 
   return (
@@ -37,12 +34,12 @@ export function PokemonCard({ pokemon, handleRelease }: PokemonProps) {
           />
         )}
       </div>
-      <div>
-        <img
+      <div className="h-24">
+        {pokemon.api && <img
           className="h-24 object-none object-cover object-bottom"
-          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${pokemon.api?.id}.gif`}
+          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${pokemon.api.id}.gif`}
           alt={displayName}
-        />
+        />}
       </div>
         <div className="w-24 h-5 text-center font-medium bg-white border-t">
           {pokemon.name ?? displayName}

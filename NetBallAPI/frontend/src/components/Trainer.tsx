@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
-import { MainClient, Pokemon as ApiPokemon } from "pokenode-ts";
 import { PokemonCard, DbPokemon } from "./Pokemon";
 import axios from "axios";
-import { useFoo } from "../hooks/foo";
+import { usePokemon } from "../hooks/pokemon";
 
 export interface Trainer {
   id: number;
@@ -18,24 +16,41 @@ export interface TrainerProps {
 
 export function TrainerCard({ trainer }: TrainerProps) {
 
-  const [pokemon, addPokemon, removePokemon] = useFoo(trainer.ownedPokemon);   
+  const [pokemon, addPokemon, removePokemon, replacePokemon] = usePokemon(trainer.ownedPokemon);   
 
   function handleCatchPokemon() {
-    
-    axios.post("https://localhost:7125/pokemon", {
+    const newPokemon: DbPokemon = {
       id: 0,
       dex: Math.floor(Math.random() * 649) + 1,
+      name: "",
       catcherId: trainer.id,
       ownerId: trainer.id,
+    } 
+
+    console.log(pokemon);
+
+    addPokemon(newPokemon);
+    axios.post("https://localhost:7125/pokemon", newPokemon)
+    .then((response) => {
+      console.log(response.data);
+      replacePokemon(0, response.data)
+      console.log(pokemon);
     })
-    .then((response) => addPokemon(response.data))
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      removePokemon(0);
+      console.log(error)
+    });
   }
 
   function handleReleasePokemon(id: number) {
+    const removedPokemon = removePokemon(id);
     axios.delete(`https://localhost:7125/pokemon/${id}`)
-    .then(() => removePokemon(id))
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      // This might remove an item in the middle of an array and put it at the end,
+      // so an error here could be visible.
+      if (removedPokemon) addPokemon(removedPokemon);
+      console.log(error)
+    });
   }
 
   if (pokemon === undefined) return <>Loading...</>;
@@ -46,12 +61,12 @@ export function TrainerCard({ trainer }: TrainerProps) {
         {trainer.name}'{!trainer.name.endsWith('s') && "s"} Pokémon
       </div>
       <div className="grid grid-cols-6 gap-1">
-        {pokemon.map((apiPokemon, i) =>
-          ownedDbPokemon[i] !== undefined &&
+        {pokemon.map((pokemon) =>
+          pokemon !== undefined &&
           <PokemonCard 
-            key={ownedDbPokemon[i].id} 
-            pokemon={ownedDbPokemon[i]} 
-            handleRelease={() => handleReleasePokemon(ownedDbPokemon[i].id)}
+            key={pokemon.id} 
+            pokemon={pokemon} 
+            handleRelease={() => handleReleasePokemon(pokemon.id)}
           />
         )}
         <div className="w-24 h-36 transition ease-in-out hover:scale-110">
